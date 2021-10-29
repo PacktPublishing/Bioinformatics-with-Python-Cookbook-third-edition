@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.4
+#       jupytext_version: 1.13.0
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -103,17 +103,13 @@ dev_off()
 Image(filename='out.png')
 
 # %%
-#pd_yri_ceu = pandas2ri.ri2py(yri_ceu)
-#print(type(pd_yri_ceu))
-#pd_yri_ceu
 with localconverter(ro.default_converter + pandas2ri.converter):
   pd_yri_ceu = ro.conversion.rpy2py(yri_ceu)
-pd_yri_ceu
-
-# %%
 del pd_yri_ceu['PAIRED_FASTQ']
 # no_paired = pandas2ri.py2ri(pd_yri_ceu)
 with localconverter(ro.default_converter + pandas2ri.converter):
   no_paired = ro.conversion.py2rpy(pd_yri_ceu)
 robjects.r.assign('no.paired', no_paired)
 robjects.r("print(colnames(no.paired))")
+
+# %%
