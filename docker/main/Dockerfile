@@ -11,10 +11,11 @@ RUN git clone https://github.com/PacktPublishing/Bioinformatics-with-Python-Cook
 RUN conda config --add channels conda-forge
 RUN conda config --add channels bioconda
 RUN conda create -n bionformatics_base --file /Bioinformatics-with-Python-Cookbook-third-Edition/Chapter01/bioinformatics_base.txt
+RUN conda init bash
 
 EXPOSE 9875
 
 WORKDIR /Bioinformatics-with-Python-Cookbook-third-Edition
 
 RUN echo setterm -foreground magenta >> /etc/bash.bashrc
-# CMD jupyter-notebook --ip=0.0.0.0 --no-browser --allow-root --port=9875
+CMD conda activate bioinformatics_base; jupyter-lab --ip=0.0.0.0 --no-browser --allow-root --port=9875 --NotebookApp.token='' --NotebookApp.password=''
