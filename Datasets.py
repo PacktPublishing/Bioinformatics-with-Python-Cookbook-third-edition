@@ -8,11 +8,9 @@
 
 # # Python and the Surrounding Software Ecology
 #
-# ## Interfacing with R via rpy2
+# ## R sections
 #
-#     sequence.index Please FTP from this URL(cut and paste)
-#
-# ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/historical_data/former_toplevel/sequence.index
+# http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/20130502.phase3.sequence.index
 #
 
 
