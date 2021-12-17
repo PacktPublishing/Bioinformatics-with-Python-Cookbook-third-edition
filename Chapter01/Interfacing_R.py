@@ -17,7 +17,7 @@
 
 # %%
 # !rm sequence.index 2>/dev/null
-# !wget -nd ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/historical_data/former_toplevel/sequence.index -O sequence.index
+# !wget -nd http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/20130502.phase3.sequence.index -O sequence.index
 
 # %% [markdown]
 # # Interfacing with R
@@ -82,8 +82,8 @@ robjects.r('seq.data$POPULATION <- as.factor(seq.data$POPULATION)')
 # %%
 ggplot2.theme = SignatureTranslatedFunction(ggplot2.theme,
                                             init_prm_translate = {'axis_text_x': 'axis.text.x'})
-bar = ggplot2.ggplot(seq_data) + ggplot2.geom_bar() + ggplot2.aes_string(x='CENTER_NAME') + ggplot2.theme(axis_text_x=ggplot2.element_text(angle=90, hjust=1))
-robjects.r.png('out.png', type='cairo-png')
+bar = ggplot2.ggplot(seq_data) + ggplot2.geom_bar() + ggplot2.aes_string(x='CENTER_NAME') + ggplot2.theme(axis_text_x=ggplot2.element_text(angle=90, hjust=1, size=40), axis_text_y=ggplot2.element_text(size=40), text=ggplot2.element_text(size=40))
+robjects.r.png('out.png', width=16, height=9, units="in", res=600) 
 bar.plot()
 dev_off = robjects.r('dev.off')
 dev_off()
@@ -96,7 +96,7 @@ yri_ceu = robjects.r('yri_ceu')
 
 # %%
 scatter = ggplot2.ggplot(yri_ceu) + ggplot2.aes_string(x='BASE_COUNT', y='READ_COUNT', shape='factor(POPULATION)', col='factor(ANALYSIS_GROUP)') + ggplot2.geom_point()
-robjects.r.png('out.png')
+robjects.r.png('out.png', width=16, height=9, units="in", res=600)
 scatter.plot()
 dev_off = robjects.r('dev.off')
 dev_off()
