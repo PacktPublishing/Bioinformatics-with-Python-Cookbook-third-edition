@@ -29,7 +29,7 @@ fig.savefig("naive_chart.png")
 
 # OO interface vs matlab...
 
-fig = plt.figure(figsize=(16, 9), tight_layout=True)
+fig = plt.figure(figsize=(16, 9), tight_layout=True, dpi=600)
 fig.suptitle("Fraction of empty values per column", fontsize="48")
 ax = fig.add_subplot()
 b1 = ax.bar(x_positions, bar_values)
@@ -88,7 +88,7 @@ top_state_unk = top_state_dead[top_state_dead.SEX == "U"][0]
 
 fig, ((vax_cnt, time_dist), (death_time, state_reps)) = plt.subplots(
     2, 2,
-    figsize=(16, 9), tight_layout=True)
+    figsize=(16, 9), tight_layout=True, dpi=600)
 
 vax_cnt.set_title("Vaccines involved in deaths")
 wedges, texts = vax_cnt.pie(large_values)

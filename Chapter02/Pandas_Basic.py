@@ -43,12 +43,13 @@ vdata["AGE_YRS"].sort_values().plot(use_index=False)
 
 vdata["AGE_YRS"].sort_values().plot(use_index=False)
 
-fig, ax = plt.subplots(1, 2, sharey=True)
+fig, ax = plt.subplots(1, 2, sharey=True, dpi=300)
 fig.suptitle("Age of adverse events")
 vdata["AGE_YRS"].sort_values().plot(
     use_index=False, ax=ax[0],
     xlabel="Obervation", ylabel="Age")
 vdata["AGE_YRS"].plot.hist(bins=20, orientation="horizontal")
+fig.savefig("adverse.png")
 
 vdata["AGE_YRS"].dropna().apply(lambda x: int(x)).value_counts()
 # not documented
