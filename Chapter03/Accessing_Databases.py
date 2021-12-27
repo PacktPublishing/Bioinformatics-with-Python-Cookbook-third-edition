@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.3
+#       jupytext_version: 1.13.0
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -25,7 +25,7 @@ print(rec)
 
 handle = Entrez.esearch(db="nucleotide", term='CRT[Gene Name] AND "Plasmodium falciparum"[Organism]')
 rec_list = Entrez.read(handle)
-if rec_list['RetMax'] < rec_list['Count']:
+if int(rec_list['RetMax']) < int(rec_list['Count']):
     handle = Entrez.esearch(db="nucleotide", term='CRT[Gene Name] AND "Plasmodium falciparum"[Organism]',
                             retmax=rec_list['Count'])
     rec_list = Entrez.read(handle)
@@ -56,6 +56,7 @@ for name, value in rec.annotations.items():
 print(len(rec.seq))
 
 refs = rec.annotations['references']
+print(refs)
 for ref in refs:
     if ref.pubmed_id != '':
         print(ref.pubmed_id)
