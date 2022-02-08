@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.3
+#       jupytext_version: 1.13.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -31,11 +31,10 @@ import functools
 
 import numpy as np
 
-# %matplotlib inline
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-import vcf
+from cyvcf2 import VCF
 
 
 # -
@@ -72,36 +71,31 @@ wins = {}
 size = 2000
 names = ['centro.vcf.gz', 'standard.vcf.gz']
 for name in names:
-    recs = vcf.Reader(filename=name)
+    recs = VCF(name)
     wins[name] = do_window(recs, size, lambda x: [1])
 
 stats = {}
-fig, ax = plt.subplots(figsize=(16, 9))
+fig, ax = plt.subplots(figsize=(16, 9), dpi=300, tight_layout=True)
 for name, nwins in wins.items():
     stats[name] = apply_win_funs(nwins, {'sum': sum})
     x_lim = [i * size  for i in range(len(stats[name]))]
     ax.plot(x_lim, [x['sum'] for x in stats[name]], label=name)
 ax.legend()
-ax.set_xlabel('Genomic location in the downloaded segment')
-ax.set_ylabel('Number of variant sites (bi-allelic SNPs)')
+ax.set_xlabel('Genomic location in the downloaded segment', fontsize='xx-large')
+ax.set_ylabel('Number of variant sites (bi-allelic SNPs)', fontsize='xx-large')
 fig.suptitle('Number of bi-allelic SNPs along the genome', fontsize='xx-large')
+fig.savefig('bi.png')
 
 # +
 mq0_wins = {}
 size = 5000
+
 def get_sample(rec, annot, my_type):
-    #We will ignore Nones
-    res = []
-    samples = rec.samples
-    for sample in samples:
-        if sample[annot] is None:
-            continue
-        res.append(my_type(sample[annot]))
-    return res
+    return [v for v in rec.format(annot) if v > np.iinfo(my_type).min]
 
 for name in names:
-    recs = vcf.Reader(filename=name)
-    mq0_wins[name] = do_window(recs, size, functools.partial(get_sample, annot='MQ0', my_type=int))
+    recs = VCF(name)
+    mq0_wins[name] = do_window(recs, size, functools.partial(get_sample, annot='MQ0', my_type=np.int32))
 # -
 
 stats = {}
@@ -116,9 +110,10 @@ for name, nwins in mq0_wins.items():
     i += 1
 #ax.set_ylim(0, 40)
 ax.legend()
-ax.set_xlabel('Genomic location in the downloaded segment')
-ax.set_ylabel('MQ0')
+ax.set_xlabel('Genomic location in the downloaded segment', fontsize='xx-large')
+ax.set_ylabel('MQ0', fontsize='xx-large')
 fig.suptitle('Distribution of MQ0 along the genome', fontsize='xx-large')
+fig.savefig('MQ0.png')
 
 
 def get_sample_relation(recs, f1, f2):
@@ -126,27 +121,27 @@ def get_sample_relation(recs, f1, f2):
     for rec in recs:
         if not rec.is_snp:
              continue
-        for sample in rec.samples:
-            try:
-                v1 = f1(sample)
-                v2 = f2(sample)
-                if v1 is None or v2 is None:
-                    continue  # We ignore Nones
-                rel[(v1, v2)] += 1
-                #careful with the size, floats: round?
-            except:
-                # This is outside the domain (typically None)
-                pass
+        for pos in range(len(rec.genotypes)):
+            v1 = f1(rec, pos)
+            v2 = f2(rec, pos)
+            if v1 is None or v2 == np.iinfo(type(v2)).min:
+                continue  # We ignore Nones
+            rel[(v1, v2)] += 1
+            # careful with the size, floats: round?
+        #break
     return rel
 
 
 rels = {}
 for name in names:
-    recs = vcf.Reader(filename=name)
-    rels[name] = get_sample_relation(recs, lambda s: 1 if s.is_het else 0, lambda s: int(s['DP']))
+    recs = VCF(name)
+    rels[name] = get_sample_relation(
+        recs,
+        lambda rec, pos: 1 if rec.genotypes[pos][0] != rec.genotypes[pos][1] else 0,
+        lambda rec, pos: rec.format('DP')[pos][0])
 
 # +
-fig, ax = plt.subplots(figsize=(16, 9))
+fig, ax = plt.subplots(figsize=(16, 9), dpi=300, tight_layout=True)
 
 def plot_hz_rel(dps, ax, ax2, name, rel):
     frac_hz = []
@@ -173,13 +168,13 @@ for name, rel in rels.items():
     plot_hz_rel(dps, ax, ax2, name, rel)
 ax.set_xlim(0, 75)
 ax.set_ylim(0, 0.2)
-ax2.set_ylabel('Quantity of calls')
-ax.set_ylabel('Fraction of Heterozygote calls')
-ax.set_xlabel('Sample Read Depth (DP)')
+ax2.set_ylabel('Quantity of calls', fontsize='xx-large')
+ax.set_ylabel('Fraction of Heterozygote calls', fontsize='xx-large')
+ax.set_xlabel('Sample Read Depth (DP)', fontsize='xx-large')
 ax.legend()
 fig.suptitle('Number of calls per depth and fraction of calls which are Hz',
              fontsize='xx-large')
-
+fig.savefig('hz.png')
 
 # -
 
@@ -206,10 +201,9 @@ accepted_eff = ['INTERGENIC', 'INTRON', 'NON_SYNONYMOUS_CODING', 'SYNONYMOUS_COD
 
 def eff_to_int(rec):
     try:
-        for annot in rec.INFO['EFF']:
-            #We use the first annotation
-            master_type = annot.split('(')[0]
-            return accepted_eff.index(master_type)
+        annot = rec.INFO['EFF']
+        master_type = annot.split('(')[0]
+        return accepted_eff.index(master_type)
     except ValueError:
         return len(accepted_eff)
 
@@ -218,10 +212,12 @@ def eff_to_int(rec):
 
 eff_mq0s = {}
 for name in names:
-    recs = vcf.Reader(filename=name)
-    eff_mq0s[name] = get_variant_relation(recs, lambda r: eff_to_int(r), lambda r: int(r.INFO['DP']))
+    recs = VCF(name)
+    eff_mq0s[name] = get_variant_relation(
+        recs,
+        lambda r: eff_to_int(r), lambda r: int(r.INFO['DP']))
 
-fig, ax = plt.subplots(figsize=(16,9))
+fig, ax = plt.subplots(figsize=(16,9), dpi=300, tight_layout=True)
 name = 'standard.vcf.gz'
 bp_vals = [[] for x in range(len(accepted_eff) + 1)]
 for k, cnt in eff_mq0s[name].items():
@@ -231,46 +227,8 @@ for k, cnt in eff_mq0s[name].items():
 #print(bp_vals[-2])
 sns.boxplot(data=bp_vals, sym='', ax=ax)
 ax.set_xticklabels(accepted_eff + ['OTHER'])
-ax.set_ylabel('DP (variant)')
+ax.set_ylabel('DP (variant)', fontsize='xx-large')
 fig.suptitle('Distribution of variant DP per SNP type',
              fontsize='xx-large')
-
-name = 'standard.vcf.gz'
-recs = vcf.Reader(filename=name)
-#mq0_dp = get_sample_relation(recs, lambda r: int(r['DP']), lambda r: int(r['GQ']))
-mq0_dp = get_variant_relation(recs, lambda r: int(r.INFO['DP']) // 10, lambda r: int(float(r.INFO['MQ'])* 10))
-
-max0 = 0
-max1 = 0
-min0 = float('inf')
-min1 = float('inf')
-for v0, v1 in mq0_dp.keys():
-    if v0 > max0:
-        max0 = v0
-    if v1 > max1:
-        max1 = v1
-    if v0 < min0:
-        min0 = v0
-    if v1 < min1:
-        min1 = v1
-print(min0, min1, max0, max1)
-min1 = 300
-max1 = 600
-max0 = 400
-mat = np.zeros((max0 + 1, max1 - min1 + 1), dtype=np.int)
-for k, cnt in mq0_dp.items():
-    v0, v1 = k
-    if v0 > max0:
-        continue
-    if v1 < min1 or v1 > max1:
-        continue
-    mat[v0, v1 - min1] = cnt
-
-from matplotlib import colors
-fig, ax = plt.subplots(figsize=(16,9))
-mtax = ax.matshow(mat, norm=colors.LogNorm(), cmap=plt.get_cmap('spring'))
-ax.set_xlabel('DP')
-ax.set_xlabel('GQ')
-cbar = fig.colorbar(mtax, orientation='vertical')
-
+fig.savefig('eff.png')
 

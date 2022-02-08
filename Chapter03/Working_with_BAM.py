@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.3
+#       jupytext_version: 1.13.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -29,7 +29,6 @@ from collections import defaultdict
 
 import numpy as np
 
-# %matplotlib inline
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -66,9 +65,13 @@ counts = [0] * 76
 for n, rec in enumerate(bam.fetch('20', 0, 10000000)):
     for i in range(rec.query_alignment_start, rec.query_alignment_end):
         counts[i] += 1
-freqs = [x / (n + 1.) for x in counts]
-fig, ax = plt.subplots(figsize=(16,9))
+freqs = [100 * x / (n + 1) for x in counts]
+fig, ax = plt.subplots(figsize=(16,9), dpi=300, tight_layout=True)
 ax.plot(range(1, 77), freqs)
+ax.set_xlabel('Read distance', fontsize='xx-large')
+ax.set_ylabel('PHRED score', fontsize='xx-large')
+fig.suptitle('Percentage of mapped calls as a function of the position from the start of the sequencer read', fontsize='xx-large')
+fig.savefig('map_perc.png')
 
 phreds = defaultdict(list)
 for rec in bam.fetch('20', 0, None):
@@ -83,8 +86,10 @@ medians_fig = [x - y for x, y in zip(medians, bottoms)]
 tops_fig = [x - y for x, y in zip(tops, medians)]
 maxs_fig = [x - y for x, y in zip(maxs, tops)]
 
-fig, ax = plt.subplots(figsize=(16,9))
+fig, ax = plt.subplots(figsize=(16,9),dpi=300, tight_layout=True)
 ax.stackplot(range(1, 77), (bottoms, medians_fig, tops_fig, maxs_fig))
 ax.plot(range(1, 77), maxs, 'k-')
-
-
+ax.set_xlabel('Read distance', fontsize='xx-large')
+ax.set_ylabel('PHRED score', fontsize='xx-large')
+fig.suptitle('Distribution of PHRED scores as a function of the position in the read', fontsize='xx-large')
+fig.savefig('phred2.png')

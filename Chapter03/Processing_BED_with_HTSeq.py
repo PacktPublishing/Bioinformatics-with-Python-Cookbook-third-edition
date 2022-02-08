@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.3
+#       jupytext_version: 1.13.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -62,3 +62,5 @@ for rec in lct_bed:
 sizes.sort()
 print("Num exons: %d / Begin: %d / End %d" % (len(sizes), exon_start, exon_end))
 print("Smaller exon: %d / Larger exon: %d / Mean size: %.1f" % (sizes[0], sizes[-1], sum(sizes)/len(sizes)))
+
+

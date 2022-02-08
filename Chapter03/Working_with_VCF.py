@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.3
+#       jupytext_version: 1.13.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -23,62 +23,65 @@
 # +
 from collections import defaultdict
 
-# %matplotlib inline
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-import vcf
+from cyvcf2 import VCF
 
 # +
-v = vcf.Reader(filename='genotypes.vcf.gz')
-
+v = VCF('genotypes.vcf.gz')
+rec = next(v)
 print('Variant Level information')
-infos = v.infos
-for info in infos:
+info = rec.INFO
+for info in rec.INFO:
     print(info)
 
 print('Sample Level information')
-fmts = v.formats
-for fmt in fmts:
+for fmt in rec.FORMAT:
     print(fmt)
-# -
-
-v = vcf.Reader(filename='genotypes.vcf.gz')
-rec = next(v)
-print(rec.CHROM, rec.POS, rec.ID, rec.REF, rec.ALT, rec.QUAL, rec.FILTER)
-print(rec.INFO)
-print(rec.FORMAT)
-samples = rec.samples
-print(len(samples))
-sample = samples[0]
-print(sample.called, sample.gt_alleles, sample.is_het, sample.is_variant, sample.phased)
-print(int(sample['DP']))
 
 # +
-f = vcf.Reader(filename='genotypes.vcf.gz')
+v = VCF('genotypes.vcf.gz')
+samples = v.samples
+print(len(samples))  # Order change
+
+variant = next(v)
+print(variant.CHROM, variant.POS, variant.ID, variant.REF, variant.ALT, variant.QUAL, variant.FILTER)
+print(variant.INFO)
+print(variant.FORMAT)
+print(variant.is_snp)
+
+#rec.format('DP')
+#rec.format('GT')
+
+str_alleles = variant.gt_bases[0]
+alleles = variant.genotypes[0][0:2]
+is_phased = variant.genotypes[0][2]
+print(str_alleles, alleles, is_phased)
+print(variant.format('DP')[0])
+
+# +
+f = VCF('genotypes.vcf.gz')
 
 my_type = defaultdict(int)
 num_alts = defaultdict(int)
 
-for rec in f:
-    my_type[rec.var_type, rec.var_subtype] += 1
-    if rec.is_snp:
-        num_alts[len(rec.ALT)] += 1
+for variant in f:
+    my_type[variant.var_type, variant.var_subtype] += 1
+    if variant.var_type == 'snp':
+        num_alts[len(variant.ALT)] += 1
 print(my_type)
 print(num_alts)
 
 # +
-f = vcf.Reader(filename='genotypes.vcf.gz')
+f = VCF('genotypes.vcf.gz')
 
 sample_dp = defaultdict(int)
-for rec in f:
-    if not rec.is_snp or len(rec.ALT) != 1:
+for variant in f:
+    if not variant.is_snp or len(variant.ALT) != 1:
         continue
-    for sample in rec.samples:
-        dp = sample['DP']
-        if dp is None:
-            dp = 0
-        dp = int(dp)
+    for dp in variant.format('DP'):
+        #dp = int(dp)
         sample_dp[dp] += 1
 # -
 
