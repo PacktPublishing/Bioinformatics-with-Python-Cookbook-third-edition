@@ -17,46 +17,51 @@ import zarr
 
 mosquito = zarr.open('data/AG1000G-AO/2L/calldata/GT')
 mosquito
-zarr.array(mosquito, chunks=(48525747 // 4, 81, 2), store='data/rechunk')
-
+zarr.array(mosquito, chunks=(1 + 48525747 // 4, 81, 2), store='data/rechunk')
 # -
 
-a = zarr.open('data/rechunk')
-dir(a)
-#a.chunks
+mosquito = zarr.open('data/rechunk')
+mosquito.chunks
 
 # +
+import numpy as np
 import dask.array as da
 
-mosquito = da.from_zarr('data/AG1000G-AO/2L/calldata/GT')
+mosquito = da.from_zarr('data/rechunk')
 # ^^^ load array
 # -
 
 mosquito
 
-rechunked_mosquito = da.rechunk(mosquito, chunks=(300000, -1, -1))
-rechunked_mosquito
+print(mosquito[0])
 
-chunk_pos_size = gt_2l.chunks[0]
-max_pos = gt_2l.shape[0]
+mosquito[0].compute()
 
-complete_data = 0
-more_anc_hom = 0
-total_pos = 0
-# do a single case
-for chunk_pos in range(ceil(max_pos / chunk_pos_size)):
-    start_pos = chunk_pos * chunk_pos_size
-    end_pos = min(max_pos + 1, (chunk_pos + 1) * chunk_pos_size)
-    my_chunk = np.array(
-        gt_2l[start_pos:end_pos, :, :])
-    #print(start_pos, end_pos, my_chunk.shape)
-    num_samples = my_chunk.shape[1]
-    num_miss, num_anc_hom, num_het = calc_stats(my_chunk)
-    chunk_complete_data = np.sum(np.equal(num_miss, 0))
-    #print(end_pos - start_pos, my_chunk.shape, num_anc_hom.shape, num_het.shape)
-    chunk_more_anc_hom = np.sum(num_anc_hom > num_het)
-    complete_data += chunk_complete_data
-    more_anc_hom += chunk_more_anc_hom
-    total_pos += (end_pos - start_pos)
-print(complete_data, more_anc_hom, total_pos)
+mosquito.visualize()
+
+
+def calc_stats(variant):
+    # vvv NumPy
+    variant = variant.reshape(variant.shape[0] // 2, 2)
+    misses = np.equal(variant, -1)
+    hets = np.not_equal(
+            variant[:,0],
+            variant[:,1])
+    return misses
+    #return num_miss, num_het
+
+
+
+mosquito_2d = mosquito.reshape(mosquito.shape[0], mosquito.shape[1] * mosquito.shape[2])
+mosquito_2d
+
+
+cs = da.gufunc(calc_stats, signature="(n,m)->(n)", output_dtypes=float, vectorize=True)
+
+
+cs(mosquito_2d)
+# mosquito_2d
+
+
+help(np.sum)
 
