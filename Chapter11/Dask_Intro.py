@@ -53,7 +53,11 @@ def calc_stats(variant):
 
 
 mosquito_2d = mosquito.reshape(mosquito.shape[0], mosquito.shape[1] * mosquito.shape[2])
-mosquito_2d
+mosquito_2d.shape
+x = da.apply_along_axis(
+    calc_stats, 1, mosquito_2d,
+    shape=(5, 81), dtype=bool)
+x
 
 
 cs = da.gufunc(calc_stats, signature="(n,m)->(n)", output_dtypes=float, vectorize=True)
