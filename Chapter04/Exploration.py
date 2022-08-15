@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.8
+#       jupytext_version: 1.14.0
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pandas.plotting import scatter_matrix
 
-# #%matplotlib inline
+# %matplotlib inline
 # -
 
 fit = np.load(gzip.open('balanced_fit.npy.gz', 'rb'))
@@ -33,7 +33,7 @@ num_samples = 80
 del fit
 
 fig,ax = plt.subplots(figsize=(16,9))
-fit_df.hist(column=ordered_features, ax=ax)
+_ = fit_df.hist(column=ordered_features, ax=ax)
 
 fit_df['MeanDP'] = fit_df['DP'] / 80
 fig, ax = plt.subplots()

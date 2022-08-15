@@ -66,9 +66,6 @@ print(demux_summarize_signature.outputs)
 seqs1 = Result.load('fmt-tutorial-demux-1-10p.qza')
 sum_data1 = demux_summarize(seqs1)
 
-print(dir(sum_data1))
-print(type(sum_data1.visualization))
-print(dir(sum_data1.visualization))
 sum_data1.visualization
 
 # +
