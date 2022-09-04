@@ -1,0 +1,7 @@
+rest_protocol: http
+server: localhost
+rest_port: 8080
+sftp_port: 8022
+user: admin@galaxy.org
+password: password
+api_key: fakekey
