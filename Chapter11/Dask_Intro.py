@@ -5,20 +5,18 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.6
+#       jupytext_version: 1.13.0
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
 
-# +
 import zarr
 
 mosquito = zarr.open('data/AG1000G-AO/2L/calldata/GT')
 mosquito
 zarr.array(mosquito, chunks=(1 + 48525747 // 4, 81, 2), store='data/rechunk')
-# -
 
 mosquito = zarr.open('data/rechunk')
 mosquito.chunks
@@ -28,6 +26,7 @@ import numpy as np
 import dask.array as da
 
 mosquito = da.from_zarr('data/rechunk')
+#mosquito = da.from_zarr('data/AG1000G-AO/2L/calldata/GT')
 # ^^^ load array
 # -
 
@@ -37,35 +36,29 @@ print(mosquito[0])
 
 mosquito[0].compute()
 
-mosquito.visualize()
+mosquito.visualize(rankdir='TB')
 
 
 def calc_stats(variant):
-    # vvv NumPy
     variant = variant.reshape(variant.shape[0] // 2, 2)
-    misses = np.equal(variant, -1)
-    hets = np.not_equal(
-            variant[:,0],
-            variant[:,1])
-    return misses
-    #return num_miss, num_het
-
+    num_misses = np.sum(np.equal(variant, -1)) // 2
+    return num_misses
 
 
 mosquito_2d = mosquito.reshape(mosquito.shape[0], mosquito.shape[1] * mosquito.shape[2])
-mosquito_2d.shape
-x = da.apply_along_axis(
-    calc_stats, 1, mosquito_2d,
-    shape=(5, 81), dtype=bool)
-x
+mosquito_2d.visualize(rankdir='TB')
 
+mosquito_2d
 
-cs = da.gufunc(calc_stats, signature="(n,m)->(n)", output_dtypes=float, vectorize=True)
+max_pos = 10000000
+stats = da.apply_along_axis(
+    calc_stats, 1, mosquito_2d[:max_pos,:],
+    shape=(max_pos,), dtype=np.int64)
 
+stats.visualize('x.png',rankdir='TB')
 
-cs(mosquito_2d)
-# mosquito_2d
+a = stats.compute()
 
+a
 
-help(np.sum)
 

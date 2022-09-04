@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.6
+#       jupytext_version: 1.13.0
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -32,20 +32,9 @@ import zarr
 
 mosquito = zarr.open('data/AG1000G-AO')
 print(mosquito.tree())
-# -
-
-mosquito['samples']
-
-np.array(mosquito['samples'])
 
 gt_2l = mosquito['/2L/calldata/GT']
 gt_2l.info
-
-gt_2l[400000,:,:]
-
-# +
-# Do not do np.array(gt_2l)
-# -
 
 dir(gt_2l)
 gt_2l.shape[0]
@@ -53,9 +42,6 @@ gt_2l.shape[0]
 # +
 from math import ceil
 from multiprocessing import Pool
-
-chunk_pos_size = gt_2l.chunks[0]
-max_pos = gt_2l.shape[0]
 
 
 def calc_stats(my_chunk):
@@ -68,9 +54,11 @@ def calc_stats(my_chunk):
         np.not_equal(
             my_chunk[:,:,0],
             my_chunk[:,:,1]), axis=1)
-    #print(num_anc_hom.shape)
-    #print(num_het.shape)
     return num_miss, num_anc_hom, num_het
+
+
+chunk_pos_size = gt_2l.chunks[0]
+max_pos = gt_2l.shape[0]
 
 
 intervals = []
@@ -82,15 +70,14 @@ for chunk_pos in range(ceil(max_pos / chunk_pos_size)):
 
 def compute_interval(interval):
     start_pos, end_pos = interval
-    my_chunk = np.array(
-        gt_2l[start_pos:end_pos, :, :])
+    my_chunk = gt_2l[start_pos:end_pos, :, :]
     num_samples = my_chunk.shape[1]
     num_miss, num_anc_hom, num_het = calc_stats(my_chunk)
     chunk_complete_data = np.sum(np.equal(num_miss, 0))
-    #print(end_pos - start_pos, my_chunk.shape, num_anc_hom.shape, num_het.shape)
     chunk_more_anc_hom = np.sum(num_anc_hom > num_het)
     return chunk_complete_data, chunk_more_anc_hom
-    
+
+
 with Pool() as p:
     print(p)
     chunk_returns = p.map(compute_interval, intervals)
@@ -98,3 +85,6 @@ with Pool() as p:
     more_anc_hom = sum(map(lambda x: x[1], chunk_returns))
     
     print(complete_data, more_anc_hom)
+# -
+
+
