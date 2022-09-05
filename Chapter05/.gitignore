@@ -1,0 +1,4 @@
+*.fasta
+ag.db
+*gz
+*png
