@@ -1,0 +1,83 @@
+from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+
+HTTP = HTTPRemoteProvider()
+
+
+download_root = "https://ftp.ncbi.nlm.nih.gov/hapmap/genotypes/hapmap3_r3"
+
+remote_hapmap_map = f"{download_root}/plink_format/hapmap3_r3_b36_fwd.consensus.qc.poly.map.gz"
+remote_hapmap_ped = f"{download_root}/plink_format/hapmap3_r3_b36_fwd.consensus.qc.poly.ped.gz"
+remote_hapmap_rel = f"{download_root}/relationships_w_pops_041510.txt"
+
+
+rule plink_download:
+    input:
+        map=HTTP.remote(remote_hapmap_map, keep_local=True),
+        ped=HTTP.remote(remote_hapmap_ped, keep_local=True),
+        rel=HTTP.remote(remote_hapmap_rel, keep_local=True)
+
+    output:
+        map="scratch/hapmap.map.gz",
+        ped="scratch/hapmap.ped.gz",
+        rel="data/relationships.txt"
+
+    shell:
+        "mv {input.map} {output.map};"
+        "mv {input.ped} {output.ped};"
+        "mv {input.rel} {output.rel}"
+
+
+PLINKEXTS = ['ped', 'map']
+
+
+rule uncompress_plink:
+    input:
+        "scratch/hapmap.{plinkext}.gz"
+
+    output:
+        "data/hapmap.{plinkext}"
+
+    shell:
+        "gzip -dc {input} > {output}"
+
+
+rule subsample_1p:
+    input:
+        "data/hapmap.ped",
+        "data/hapmap.map"
+
+    output:
+        "data/hapmap1.ped",
+        "data/hapmap1.map"
+
+    run:
+        shell(f"plink2 --pedmap {input[0][:-4]} --out {output[0][:-4]} --thin 0.01 --geno 0.1 --export ped")
+
+# snakemake and software requirements
+
+# https://snakemake.readthedocs.io/en/stable/tutorial/additional_features.html#automatic-deployment-of-software-dependencies
+#plink2 --pedmap data/hapmap --out data/hapmap10 --thin 0.1 --geno 0.1 --export ped
+
+rule plink_pca:
+    input:
+        "data/hapmap1.ped",
+        "data/hapmap1.map"
+
+    output:
+        "data/hapmap1.eigenvec",
+        "data/hapmap1.eigenval"
+
+    shell:
+        "plink2 --pca --pedmap data/hapmap1 -out data/hapmap1"
+
+
+rule plot_pca:
+    input:
+        "data/hapmap1.eigenvec",
+        "data/hapmap1.eigenval"
+
+    output:
+        "pca.png"
+
+    script:
+        "./plot_pca.py"

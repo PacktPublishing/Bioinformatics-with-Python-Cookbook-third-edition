@@ -1,7 +1,0 @@
-rest_protocol: http
-server: localhost
-rest_port: 8080
-ftp_port: 8021
-user: admin
-password: password
-api_key: fakekey
