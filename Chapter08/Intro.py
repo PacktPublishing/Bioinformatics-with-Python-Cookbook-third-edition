@@ -46,11 +46,13 @@ uniprot_list.rename(columns={'Organism ID': 'ID'}, inplace=True)
 uniprot_list
 # -
 
-p53_human = uniprot_list[uniprot_list.ID == 9606]['Entry'].tolist()[0]
+p53_human = uniprot_list[
+    (uniprot_list.ID == 9606) &
+    (uniprot_list['Entry name'].str.contains('P53'))]['Entry'].iloc[0]
 
 handle = ExPASy.get_sprot_raw(p53_human)
 
-sp_rec= SwissProt.read(handle)
+sp_rec = SwissProt.read(handle)
 
 print(sp_rec.entry_name, sp_rec.sequence_length, sp_rec.gene_name)
 print(sp_rec.description)
@@ -63,21 +65,21 @@ print(sp_rec.keywords)
 help(sp_rec)
 
 done_features = set()
-print(len(sp_rec.features))
+print('Total features:', len(sp_rec.features))
 for feature in sp_rec.features:
-    if feature[0] in done_features:
+    if feature in done_features:
         continue
     else:
-        done_features.add(feature[0])
+        done_features.add(feature)
         print(feature)
-print(len(sp_rec.cross_references))
+print('Cross references: ',len(sp_rec.cross_references))
 per_source = defaultdict(list)
 for xref in sp_rec.cross_references:
     source = xref[0]
     per_source[source].append(xref[1:])
 print(per_source.keys())
 done_GOs = set()
-print(len(per_source['GO']))
+print('Annotation SOURCES:', len(per_source['GO']))
 for annot in per_source['GO']:
     if annot[1][0] in done_GOs:
         continue
