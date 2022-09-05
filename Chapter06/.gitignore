@@ -1,0 +1,10 @@
+*.log
+*.ped
+*.map
+*.bed
+*.bim
+*.fam
+exclude*.txt
+relationships_w_pops_041510.txt
+*.in
+*.out
