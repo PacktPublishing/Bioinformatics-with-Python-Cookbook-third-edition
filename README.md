@@ -4,26 +4,23 @@
 
 This is the code repository for [Bioinformatics with Python Cookbook - Third Edition](https://www.packtpub.com/product/bioinformatics-with-python-cookbook-third-edition/9781803236421), published by Packt.
 
-**Build the mind and hand of a Google Certified ML professional**
+**Use modern Python libraries and applications to solve real-world computational biology problems	**
 
 ## What is this book about?
+Bioinformatics is an active research field that uses a range of simple-to-advanced computations to extract valuable information from biological data, and this book will show you how to manage these tasks using Python.
 
-This book aims to provide a study guide to learn and master machine learning in Google Cloud: to build a broad and strong knowledge base, train hands-on skills, and get certified as a Google Cloud Machine Learning Engineer.
+This updated third edition of the Bioinformatics with Python Cookbook begins with a quick overview of the various tools and libraries in the Python ecosystem that will help you convert, analyze, and visualize biological datasets. Next, you'll cover key techniques for next-generation sequencing, single-cell analysis, genomics, metagenomics, population genetics, phylogenetics, and proteomics with the help of real-world examples. You'll learn how to work with important pipeline systems, such as Galaxy servers and Snakemake, and understand the various modules in Python for functional and asynchronous programming. This book will also help you explore topics such as SNP discovery using statistical approaches under high-performance computing frameworks, including Dask and Spark. In addition to this, you’ll explore the application of machine learning algorithms in bioinformatics.
 
-The book is for someone who has the basic Google Cloud Platform (GCP) knowledge and skills, and basic Python programming skills, and wants to learn machine learning in GCP to take their next step toward becoming a Google Cloud Certified Machine Learning professional.
-
-The book starts by laying the foundations of Google Cloud Platform and Python programming, followed the by building blocks of machine learning, then focusing on machine learning in Google Cloud, and finally ends the studying for the Google Cloud Machine Learning certification by integrating all the knowledge and skills together.
-
-The book is based on the graduate courses the author has been teaching at the University of Texas at Dallas. When going through the chapters, the reader is expected to study the concepts, complete the exercises, understand and practice the labs in the appendices, and study each exam question thoroughly. Then, at the end of the learning journey, you can expect to harvest the knowledge, skills, and a certificate.
+By the end of this bioinformatics Python book, you'll be equipped with the knowledge you need to implement the latest programming techniques and frameworks, empowering you to deal with bioinformatics data on every scale.
 
 This book covers the following exciting features: 
-* Provision Google Cloud services related to data science and machine learning
-* Program with the Python programming language and data science libraries
-* Understand machine learning concepts and model development processes
-* Explore deep learning concepts and neural networks
-* Build, train, and deploy ML models with Google BigQuery ML, Keras, and Google Cloud Vertex AI
-* Discover the Google Cloud ML Application Programming Interface (API)
-* Prepare to achieve Google Cloud Professional Machine Learning Engineer certification
+* Become well-versed with data processing libraries such as NumPy, pandas, arrow, and zarr in the context of bioinformatic analysis
+* Interact with genomic databases
+* Solve real-world problems in the fields of population genetics, phylogenetics, and proteomics
+* Build bioinformatics pipelines using a Galaxy server and Snakemake
+* Work with functools and itertools for functional programming
+* Perform parallel processing with Dask on biological data
+* Explore principal component analysis (PCA) techniques with scikit-learn
 
 If you feel this book is for you, get your [copy](https://www.amazon.in/Bioinformatics-Python-Cookbook-bioinformatics-computational/dp/1789344697/ref=sr_1_2?keywords=Bioinformatics+with+Python+Cookbook+-+Third+Edition&qid=1665382032&sr=8-2) today!
 
@@ -34,14 +31,14 @@ All of the code is organized into folders.
 
 The code will look like the following:
 ```
-html, body, #map {
-height: 100%;
-margin: 0;
-padding: 0
-}
+from Bio import SeqIO
+genome_name = 'PlasmoDB-9.3_Pfalciparum3D7_Genome.fasta'
+recs = SeqIO.parse(genome_name, 'fasta')
+for rec in recs:
+print(rec.description)
 ```
 **Following is what you need for this book:**
-This book is for business intelligence (BI) developers and data analysts who are looking to create interactive dashboards using data from Lake House on AWS with Amazon QuickSight. This book will also be useful for anyone who wants to learn Amazon QuickSight in depth using practical examples. You will need to be familiar with general data visualization concepts, however, no prior experience with Amazon QuickSight is required.
+This book is for bioinformatics analysts, data scientists, computational biologists, researchers, and Python developers who want to address intermediate-to-advanced biological and bioinformatics problems. Working knowledge of the Python programming language is expected. Basic knowledge of biology will also be helpful.
 
 With the following software and hardware list you can run all code files present in the book (Chapter 1-12).
 
