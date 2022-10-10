@@ -4,7 +4,7 @@
 
 This is the code repository for [Bioinformatics with Python Cookbook - Third Edition](https://www.packtpub.com/product/bioinformatics-with-python-cookbook-third-edition/9781803236421), published by Packt.
 
-**Use modern Python libraries and applications to solve real-world computational biology problems	**
+**Use modern Python libraries and applications to solve real-world computational biology problems**
 
 ## What is this book about?
 Bioinformatics is an active research field that uses a range of simple-to-advanced computations to extract valuable information from biological data, and this book will show you how to manage these tasks using Python.
