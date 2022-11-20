@@ -116,9 +116,11 @@ kmeans4 = KMeans(n_clusters=4).fit(trans)
 plot_kmeans_pca(trans, kmeans4)
 
 pca_predict = my_pca.transform([predict_case])
-kmeans.predict(pca_predict)
+kmeans4.predict(pca_predict)
 
 last_train = ind_order[-2]
 last_train, ind_pop[last_train]
 
-kmeans.predict(trans)[0]
+kmeans4.predict(trans)[0]
+
+

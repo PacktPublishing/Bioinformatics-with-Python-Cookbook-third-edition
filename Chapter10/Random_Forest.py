@@ -55,7 +55,7 @@ trainning_input = samples.iloc[:,:-1]
 target = samples.iloc[:,-1]
 
 # + jupyter={"outputs_hidden": false}
-clf = RandomForestClassifier(max_depth=3)
+clf = RandomForestClassifier(max_depth=3, n_estimators=200)
 
 # + jupyter={"outputs_hidden": false}
 clf.fit(trainning_input, target)
@@ -67,7 +67,9 @@ importances = pd.Series(
 importances
 # -
 
-clf.score(trainning_input, target)
+100 * clf.score(trainning_input, target)
+
+
 
 for test_size in [0.01, 0.1, 0.2, 0.5, 0.8, 0.9, 0.99]:
     X_train, X_test, y_train, y_test = train_test_split(
@@ -77,3 +79,5 @@ for test_size in [0.01, 0.1, 0.2, 0.5, 0.8, 0.9, 0.99]:
     score = tclf.score(X_test, y_test)
     print(f'{1 - test_size:.1%} {score:.2%}')
 # Random number generator
+
+

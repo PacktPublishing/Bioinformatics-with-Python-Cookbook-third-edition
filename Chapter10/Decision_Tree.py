@@ -50,24 +50,27 @@ samples = pd.read_csv('clean.data', header=None, names=column_names, index_col=0
 samples
 
 # + jupyter={"outputs_hidden": false}
-trainning_input = samples.iloc[:,:-1]
+training_input = samples.iloc[:,:-1]
 target = samples.iloc[:,-1].apply(lambda x: 0 if x == 2 else 1)
 
 # + jupyter={"outputs_hidden": false}
 clf = tree.DecisionTreeClassifier(max_depth=3)
 
 # + jupyter={"outputs_hidden": false}
-clf.fit(trainning_input, target)
+clf.fit(training_input, target)
 
 # + jupyter={"outputs_hidden": false}
 importances = pd.Series(
     clf.feature_importances_ * 100,
-    index=trainning_input.columns).sort_values(ascending=False)
+    index=training_input.columns).sort_values(ascending=False)
 importances
 
 # + jupyter={"outputs_hidden": false}
+100 * clf.score(training_input, target)
+
+# + jupyter={"outputs_hidden": false}
 fig, ax = plt.subplots(1, dpi=300)
-tree.plot_tree(clf,ax=ax, feature_names=trainning_input.columns, class_names=['Benign', 'Malignant'])
+tree.plot_tree(clf,ax=ax, feature_names=training_input.columns, class_names=['Benign', 'Malignant'])
 # -
 
 
