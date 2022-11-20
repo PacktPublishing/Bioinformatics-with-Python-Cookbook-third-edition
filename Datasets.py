@@ -1,3 +1,4 @@
+
 # # Datasets for the book
 #
 # Here we provide links to the datasets used in the book.
@@ -13,4 +14,9 @@
 # http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/20130502.phase3.sequence.index
 #
 
-
+# # PDB
+#
+# 
+# ## Parsing mmCIF files with Biopython
+#
+# [1TUP.cif](http://www.rcsb.org/pdb/download/downloadFile.do?fileFormat=cif&compression=NO&structureId=1TUP)"
