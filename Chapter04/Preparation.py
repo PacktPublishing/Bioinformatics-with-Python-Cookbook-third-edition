@@ -101,7 +101,7 @@ def compute_mendelian_errors(mother, father, offspring):
         # One is het, the other is homo
         homo = mother if len(mother) == 1 else father
         for ofs in offspring:
-            if len(ofs) == 1 and ofs.intersection(homo):
+            if len(ofs) == 1 and not ofs.intersection(homo):
                 # homo, but not including the allele from parent that is homo
                 num_errors += 1
                 num_ofs_problems += 1
