@@ -1,3 +1,8 @@
+# Important note
+
+As of September 2023, sgkit used in Chapter 6 has a bug. If you use Chapter 6, `pip install` this:
+
+`pip install "sgkit[plink] @ git+https://github.com/pystatgen/sgkit@72ba77697fe1ca975dc5761a0a9c4355e5e49419"`
 
 
 
@@ -56,10 +61,6 @@ With the following software and hardware list you can run all code files present
 
 We also provide a PDF file that has color images of the screenshots/diagrams used in this book. [Click here to download it](https://packt.link/3KQQO).
 
-### Related products 
-* MQTT Essentials - A Lightweight IoT Protocol [[Packt]](https://www.packtpub.com/product/mqtt-essentials-a-lightweight-iot-protocol/9781787287815) [[Amazon]](https://www.amazon.in/MQTT-Essentials-Lightweight-IoT-Protocol/dp/1787287815/ref=sr_1_1_sspa?crid=2LC9M2GWAS6E4&keywords=MQTT+Essentials+-+A+Lightweight+IoT+Protocol&qid=1665382354&sprefix=mqtt+essentials+-+a+lightweight+iot+protocol%2Caps%2C483&sr=8-1-spons&psc=1&smid=A15DBATYR506U3&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUFWRFI1TFExTkZCVVAmZW5jcnlwdGVkSWQ9QTEwNDE3OTMyOVhGTVU4U0gwRTdVJmVuY3J5cHRlZEFkSWQ9QTA5MTI4ODAzUjIyREtMT0VUTTYxJndpZGdldE5hbWU9c3BfYXRmJmFjdGlvbj1jbGlja1JlZGlyZWN0JmRvTm90TG9nQ2xpY2s9dHJ1ZQ==)
-  
-* Raspberry Pi Pico DIY Workshop [[Packt]](https://www.packtpub.com/product/raspberry-pi-pico-diy-workshop/9781801814812) [[Amazon]](https://www.amazon.in/Raspberry-Pico-DIY-Workshop-automation/dp/1801814813/ref=sr_1_1_sspa?crid=6TGUS2H1TZV&keywords=Raspberry+Pi+Pico+DIY+Workshop&qid=1665382409&sprefix=raspberry+pi+pico+diy+workshop%2Caps%2C191&sr=8-1-spons&psc=1&smid=A15DBATYR506U3&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUEyT0ZJT0Y1VjVFVzA4JmVuY3J5cHRlZElkPUEwNjQ5ODYzMzdPV1dNUDc2T08wWCZlbmNyeXB0ZWRBZElkPUEwMDQxNTAyVTNYT0g4UExGMDlVJndpZGdldE5hbWU9c3BfYXRmJmFjdGlvbj1jbGlja1JlZGlyZWN0JmRvTm90TG9nQ2xpY2s9dHJ1ZQ==)
   
 ## Get to Know the Author
 **Tiago Antao** is a bioinformatician who is currently working in the field of genomics. A former computer scientist, Tiago moved into computational biology with an MSc in bioinformatics from the Faculty of Sciences at the University of Porto, Portugal, and a PhD on the spread of drug-resistant malaria from the Liverpool School of Tropical Medicine, UK. Post his doctoral, Tiago worked with human datasets at the University of Cambridge, UK and with mosquito whole-genome sequencing data at the University of Oxford, UK, before helping to set up the bioinformatics infrastructure at the University of Montana, USA. He currently works as a data engineer in the biotechnology field in Boston, MA. He is one of the co-authors of Biopython, a major bioinformatics package written in Python.
