@@ -22,9 +22,9 @@ from Bio import SeqIO, SeqUtils
 # -
 
 # !rm -f atroparvus.fa.gz gambiae.fa.gz 2>/dev/null
-# !wget https://vectorbase.org/common/downloads/Current_Release/AgambiaePEST/fasta/data/VectorBase-57_AgambiaePEST_Genome.fasta -O gambiae.fa
+# !wget https://vectorbase.org/common/downloads/Current_Release/AgambiaePEST/fasta/data/VectorBase-67_AgambiaePEST_Genome.fasta -O gambiae.fa
 # !gzip -9 gambiae.fa
-# !wget https://vectorbase.org/common/downloads/Current_Release/AatroparvusEBRO/fasta/data/VectorBase-57_AatroparvusEBRO_Genome.fasta -O atroparvus.fa
+# !wget https://vectorbase.org/common/downloads/Current_Release/AatroparvusEBRO/fasta/data/VectorBase-67_AatroparvusEBRO_Genome.fasta -O atroparvus.fa
 # !gzip -9 atroparvus.fa
 
 gambiae_name = 'gambiae.fa.gz'
