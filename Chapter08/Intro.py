@@ -21,19 +21,25 @@ from Bio import ExPASy, SwissProt
 # -
 
 #explain why not biopython
-server = 'http://www.uniprot.org/uniprot'
-def do_request(server, ID='', **kwargs):
+server = 'https://rest.uniprot.org/uniprotkb/search'
+def do_request(server, **kwargs):
     params = ''
-    req = requests.get('%s/%s%s' % (server, ID, params),params=kwargs)
+    req = requests.get(server, params=kwargs)
     if not req.ok:
         req.raise_for_status()
     return req
 
 
-req = do_request(server, query='gene:p53 AND reviewed:yes',# AND organism:Human',
-                 format='tab',
-                 columns='id,entry name,length,organism,organism-id,database(PDB),database(HGNC)',
-                 limit='50')
+req = do_request(server,
+    # 1. Filtering human p53, reviewed entries
+    query='gene:p53 AND reviewed:true AND organism_id:9606',
+    format='tsv',
+    # 2. Specifying output columns with REST API field names
+    fields='accession,id,protein_name,gene_names,organism_name,length',
+    size=50
+)
+print(req.text)
+
 #We might revisit this for KEGG
 
 # +
@@ -42,13 +48,14 @@ import pandas as pd
 import io
 
 uniprot_list = pd.read_table(io.StringIO(req.text))
-uniprot_list.rename(columns={'Organism ID': 'ID'}, inplace=True)
-uniprot_list
+uniprot_list.rename(columns={'Organism ID': 'ID'}, 
+inplace=True)
+print(uniprot_list)
 # -
 
 p53_human = uniprot_list[
-    (uniprot_list.ID == 9606) &
-    (uniprot_list['Entry name'].str.contains('P53'))]['Entry'].iloc[0]
+    (uniprot_list.Entry == 'P04637') &
+    (uniprot_list['Entry Name'].str.contains('P53_HUMAN'))]['Entry'].iloc[0]
 
 handle = ExPASy.get_sprot_raw(p53_human)
 
