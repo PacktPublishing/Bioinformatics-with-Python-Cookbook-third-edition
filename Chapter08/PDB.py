@@ -72,21 +72,24 @@ print(p53_1tup[0]['A'][94]['CA'])
 
 # +
 from Bio.SeqIO import PdbIO, FastaIO
+from Bio import SeqIO
 
 def get_fasta(pdb_file, fasta_file, transfer_ids=None):
-    fasta_writer = FastaIO.FastaWriter(fasta_file)
-    fasta_writer.write_header()
-    for rec in PdbIO.PdbSeqresIterator(pdb_file):
-        if len(rec.seq) == 0:
-            continue
-        if transfer_ids is not None and rec.id not in transfer_ids:
-            continue
-        print(rec.id, rec.seq, len(rec.seq))
-        fasta_writer.write_record(rec)
+    records = list(PdbIO.PdbSeqresIterator(pdb_file))
+    if transfer_ids is not None:
+        records = [rec for rec in records if rec.id in transfer_ids and len(rec.seq) > 0]
+    else:
+        records = [rec for rec in records if len(rec.seq) > 0]
+    
+    with open(fasta_file, 'w') as out_handle:
+        SeqIO.write(records, out_handle, 'fasta')
+    for rec in records:
+       print(rec.id, rec.seq, len(rec.seq))
         
-get_fasta(open('pdb1tup.ent'), open('1tup.fasta', 'w'), transfer_ids=['1TUP:B'])
-get_fasta(open('pdb1olg.ent'), open('1olg.fasta', 'w'), transfer_ids=['1OLG:B'])
-get_fasta(open('pdb1ycq.ent'), open('1ycq.fasta', 'w'), transfer_ids=['1YCQ:B'])
+        
+get_fasta('pdb1tup.ent', '1tup.fasta', transfer_ids=['1TUP:B'])
+get_fasta('pdb1olg.ent', '1olg.fasta', transfer_ids=['1OLG:B'])
+get_fasta('pdb1ycq.ent', '1ycq.fasta', transfer_ids=['1YCQ:B'])
 # -
 
 
