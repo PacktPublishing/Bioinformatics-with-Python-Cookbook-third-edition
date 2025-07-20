@@ -1,34 +1,26 @@
-from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
-
-HTTP = HTTPRemoteProvider()
-
-
-download_root = "https://ftp.ncbi.nlm.nih.gov/hapmap/genotypes/hapmap3_r3"
-
-remote_hapmap_map = f"{download_root}/plink_format/hapmap3_r3_b36_fwd.consensus.qc.poly.map.gz"
-remote_hapmap_ped = f"{download_root}/plink_format/hapmap3_r3_b36_fwd.consensus.qc.poly.ped.gz"
-remote_hapmap_rel = f"{download_root}/relationships_w_pops_041510.txt"
-
+rule all:
+    input:
+        "pca.png"
 
 rule plink_download:
-    input:
-        map=HTTP.remote(remote_hapmap_map, keep_local=True),
-        ped=HTTP.remote(remote_hapmap_ped, keep_local=True),
-        rel=HTTP.remote(remote_hapmap_rel, keep_local=True)
-
     output:
         map="scratch/hapmap.map.gz",
         ped="scratch/hapmap.ped.gz",
         rel="data/relationships.txt"
-
     shell:
-        "mv {input.map} {output.map};"
-        "mv {input.ped} {output.ped};"
-        "mv {input.rel} {output.rel}"
-
+        """
+        python -c "import urllib.request; urllib.request.urlretrieve(
+            'https://ftp.ncbi.nlm.nih.gov/hapmap/genotypes/hapmap3_r3/plink_format/hapmap3_r3_b36_fwd.consensus.qc.poly.map.gz', 
+            '{output.map}')"
+        python -c "import urllib.request; urllib.request.urlretrieve(
+            'https://ftp.ncbi.nlm.nih.gov/hapmap/genotypes/hapmap3_r3/plink_format/hapmap3_r3_b36_fwd.consensus.qc.poly.ped.gz', 
+            '{output.ped}')"
+        python -c "import urllib.request; urllib.request.urlretrieve(
+            'https://ftp.ncbi.nlm.nih.gov/hapmap/genotypes/hapmap3_r3/relationships_w_pops_041510.txt', 
+            '{output.rel}')"
+        """
 
 PLINKEXTS = ['ped', 'map']
-
 
 rule uncompress_plink:
     input:
@@ -39,6 +31,7 @@ rule uncompress_plink:
 
     shell:
         "gzip -dc {input} > {output}"
+
 
 
 rule subsample_1p:
@@ -81,3 +74,4 @@ rule plot_pca:
 
     script:
         "./plot_pca.py"
+
