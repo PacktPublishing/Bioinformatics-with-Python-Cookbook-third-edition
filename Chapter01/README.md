@@ -9,6 +9,13 @@ original *Bioinformatics-with-Python-Cookbook-third-edition*, adapted for curren
 
 - Fixed a data loading failure caused by outdated FTP links.
 - Added an explicit download and verification step in Python.
+### Data download
+
+The 1000 Genomes sequence index is downloaded at runtime:
+
+```python
+url = "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/20130502.phase3.sequence.index"
+```
 - Demonstrated safe integration with R via the `rpy2` interface.
 - Converted the R data frame to pandas format for downstream analysis.
 
