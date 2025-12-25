@@ -3,10 +3,7 @@
 
 # # Chapter 1 – Using rpy2 with the 1000 Genomes Project
 # 
-# This chapter demonstrates how to interface Python with R using `rpy2`, and highlights common pitfalls when working with external bioinformatics
-# resources such as the 1000 Genomes Project.
-# 
-
+# This chapter demonstrates how to interface Python with R using `rpy2`, and highlights common pitfalls when working with external bioinformatics resources such as the 1000 Genomes Project, and demonstrates practical solutions.
 
 
 
@@ -26,29 +23,17 @@ from rpy2.robjects import conversion
 
 
 
-read_delim = robjects.r('read.delim')
-seq_data = read_delim('sequence.index', header=True,stringsAsFactors=False)
 
 
 
-
-print('This dataframe has %d columns and %d rows' 
-% (seq_data.ncol, seq_data.nrow))
-print(seq_data.colnames)
-
-
-# ## Issue: read.delim returns empty data
+# ## Interfacing with R and data access
 # 
-# When running the original cookbook code, `read.delim()` returned a dataframe with 0 rows and 1 column:
-# 
-# X404..Not.FoundECHO.is.on.
-# 
-# This indicates that the remote resource was no longer accessible, and R silently parsed an HTTP 404 response instead of tabular data.
+# This section illustrates how Python interfaces with R via `rpy2` to analyse metadata from external genomics resources. Special attention is given to data access and reproducibility, as differences in execution environments can affect how external files are retrieved and parsed.
 # 
 
-# ## Robust solution: download data explicitly in Python
+# ## Data access using Python
 # 
-# To avoid silent failures, the sequence index file was downloaded explicitly using Python before being read into R via `rpy2`.
+# To integrate external datasets into the R workflow, the sequence index file is downloaded via its public URL using Python and stored locally. The file is then read into R through `rpy2`, enabling seamless interoperability between Python-based data access and R-based analysis.
 # 
 
 
@@ -75,7 +60,6 @@ with open("20130502.phase3.sequence.index", "r") as f:
 
 
 
-
 read_delim = robjects.r('read.delim')
 seq_data = read_delim('20130502.phase3.sequence.index', header=True,stringsAsFactors=False)
 
@@ -90,9 +74,9 @@ print(seq_data.colnames)
 
 
 
-
 as_integer = robjects.r('as.integer')
 match = robjects.r.match
+
 
 
 
@@ -101,11 +85,13 @@ my_col = match('READ_COUNT', seq_data.colnames)[0] # vector returned
 print('Type of read count before as.integer: %s' % seq_data[my_col - 1].rclass[0])
 seq_data[my_col - 1] = as_integer(seq_data[my_col - 1])
 print('Type of read count after as.integer: %s' % seq_data[my_col - 1].rclass[0])
+robjects.r("seq.data <- seq.data[, c('STUDY_ID', 'STUDY_NAME', 'CENTER_NAME', 'SAMPLE_ID', 'SAMPLE_NAME', 'POPULATION', 'INSTRUMENT_PLATFORM', 'LIBRARY_LAYOUT', 'PAIRED_FASTQ', 'READ_COUNT', 'BASE_COUNT', 'ANALYSIS_GROUP')]")
 
 
 
 
-robjects.r.assign('seq.data', seq_data)
+
+robjects.r('seq.data$POPULATION <- as.factor(seq.data$POPULATION)')
 
 
 
@@ -115,8 +101,8 @@ from rpy2.robjects.functions import SignatureTranslatedFunction
 
 
 
-ggplot2.theme = SignatureTranslatedFunction(ggplot2. theme, init_prm_translate = {'axis_text_x': 'axis. text.x'})
 
+ggplot2.theme = SignatureTranslatedFunction(ggplot2. theme, init_prm_translate = {'axis_text_x': 'axis. text.x'})
 
 
 
@@ -137,26 +123,13 @@ Image(filename='out.png')
 
 
 
-robjects.r('yri_ceu <- seq.data[seq.data$POPULATION %in% c("YRI", "CEU") & seq.data$BASE_COUNT < 2E09 & seq.data$READ_COUNT < 3E07, ]')
-yri_ceu = robjects.r('yri_ceu')
 
-
-
-
-scatter = (ggplot2.ggplot(yri_ceu) +
-           ggplot2.aes_string(x='BASE_COUNT', y='READ_COUNT',
-                              shape='factor(POPULATION)', col='factor(ANALYSIS_GROUP)') +
-           ggplot2.geom_point())
-
-robjects.r.png('out1.png', type='cairo-png')
-scatter.plot()
-robjects.r('dev.off')()
-
-
-
-
-Image(filename='out1.png')
-
+# ## Data type handling and axis scaling
+# 
+# To ensure correct visualisation of sequencing metadata, the numeric columns used for plotting are explicitly coerced to numeric types prior to filtering and plotting. This avoids unintended behaviour when values are parsed as character or factor types.
+# 
+# Axis scales are defined explicitly to reflect the expected ranges of base counts and read counts, improving interpretability and ensuring consistent plot formatting across environments.
+# 
 
 
 
@@ -164,6 +137,7 @@ robjects.r("""
 seq.data$BASE_COUNT <- as.numeric(seq.data$BASE_COUNT)
 seq.data$READ_COUNT <- as.numeric(seq.data$READ_COUNT)
 """)
+
 
 
 
@@ -203,6 +177,7 @@ scatter = (
 
 robjects.r("str(yri_ceu$BASE_COUNT)")
 robjects.r("str(yri_ceu$READ_COUNT)")
+
 
 
 
