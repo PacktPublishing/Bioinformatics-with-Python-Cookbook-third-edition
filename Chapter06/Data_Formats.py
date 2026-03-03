@@ -12,7 +12,7 @@
 #     name: python3
 # ---
 
-# ## Data download
+# # Data download
 
 # +
 # !wget https://ftp.ncbi.nlm.nih.gov/hapmap/genotypes/hapmap3_r3/plink_format/hapmap3_r3_b36_fwd.consensus.qc.poly.map.gz
